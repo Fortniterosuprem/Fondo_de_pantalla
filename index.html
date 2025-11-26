@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reloj Estilo Jujutsu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Video de fondo */
+        #videoBg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 80px;
+            overflow: hidden;
+        }
+
+        /* Fondo personalizado */
+        .fire-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 0;
+        }
+
+        /* Partículas de fuego */
+        .flame-particle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(4px);
+            animation: rise 4s ease-in infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-500px) translateX(var(--tx)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Contenido principal */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .day-label {
+            font-size: 1.8rem;
+            color: #CC8844;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(200, 100, 50, 0.6);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .date-info {
+            font-size: 1.2rem;
+            color: #BB7744;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 8px rgba(150, 80, 40, 0.5);
+            font-family: 'Audiowide', cursive;
+        }
+
+        /* Contenedor de hora y barras */
+        .time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+
+        .time-display {
+            font-size: 2.5rem;
+            color: #DD9955;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(200, 100, 50, 0.7);
+            font-family: 'Orbitron', sans-serif;
+            white-space: nowrap;
+        }
+
+        /* Decoración de barras */
+        .decoration-bars {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: flex-end;
+            height: 80px;
+        }
+
+        .bar {
+            width: 4px;
+            background: linear-gradient(to top, #DD9955, #BB7744, #AA6633);
+            box-shadow: 0 0 8px rgba(200, 100, 50, 0.6);
+            opacity: 0.8;
+            border-radius: 2px;
+        }
+
+        .bar.small { height: 20px; }
+        .bar.medium { height: 30px; }
+        .bar.large { height: 40px; }
+
+        .center-dot {
+            width: 8px;
+            height: 8px;
+            background: #DD9955;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(200, 100, 50, 0.8);
+        }
+
+        /* Animación para las barras */
+        @keyframes barPulse {
+            0%, 100% {
+                opacity: 0.8;
+                box-shadow: 0 0 8px rgba(200, 100, 50, 0.6);
+            }
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 15px rgba(200, 100, 50, 0.9);
+            }
+        }
+
+        /* Las barras reaccionan solo al audio, sin animación CSS */
+
+        /* Línea decorativa */
+        .decoration-line {
+            width: 300px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #BB7744, transparent);
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(150, 80, 40, 0.6);
+        }
+
+        /* Efecto de destello */
+        .spark {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: radial-gradient(circle, #DD9955, #BB7744);
+            border-radius: 50%;
+            animation: sparkle 2s ease-out forwards;
+        }
+
+        @keyframes sparkle {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--sx), var(--sy)) scale(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video de fondo animado -->
+    <video id="videoBg" autoplay muted loop>
+        <source src="fire-arrow-sukuna-jujutsu-kaisen-moewalls-com.mp4" type="video/mp4">
+    </video>
+    
+    <div class="container">
+        <div class="fire-background"></div>
+        
+        <div class="content">
+            <div class="day-label" id="dayLabel">TUESDAY</div>
+            
+            <div class="date-info" id="dateInfo">14 NOV 2025</div>
+            
+            <div class="time-container">
+                <div class="decoration-bars">
+                    <div class="bar small"></div>
+                    <div class="bar medium"></div>
+                    <div class="bar large"></div>
+                </div>
+                
+                <div class="time-display" id="timeDisplay">17:50</div>
+                
+                <div class="decoration-bars">
+                    <div class="bar large"></div>
+                    <div class="bar medium"></div>
+                    <div class="bar small"></div>
+                </div>
+            </div>
+            
+            <div class="decoration-line"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor para partículas de fuego -->
+    <div id="particles-container"></div>
+
+    <script>
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let isAudioActive = false;
+
+        // Función para iniciar la captura de audio automáticamente
+        async function initAudio() {
+            try {
+                // Crear contexto de audio
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Solicitar acceso al micrófono
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    } 
+                });
+
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.6;
+                
+                const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+                mediaStreamSource.connect(analyser);
+                
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                isAudioActive = true;
+                
+                // Iniciar la animación
+                updateBarsFromAudio();
+                
+            } catch (error) {
+                console.log('Error al acceder al audio:', error);
+            }
+        }
+
+        // Iniciar automáticamente cuando carga la página
+        window.addEventListener('load', initAudio);
+
+        // Nombres de días en inglés
+        const daysOfWeek = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+        // Función para actualizar la hora y fecha
+        function actualizarReloj() {
+            const ahora = new Date();
+            
+            // Día de la semana
+            const dayName = daysOfWeek[ahora.getDay()];
+            document.getElementById('dayLabel').textContent = dayName;
+            
+            // Fecha
+            const day = String(ahora.getDate()).padStart(2, '0');
+            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const month = monthNames[ahora.getMonth()];
+            const year = ahora.getFullYear();
+            document.getElementById('dateInfo').textContent = `${day} ${month} ${year}`;
+            
+            // Hora
+            const horas = String(ahora.getHours()).padStart(2, '0');
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            document.getElementById('timeDisplay').textContent = `${horas}:${minutos}`;
+        }
+
+        // Actualizar reloj inmediatamente y cada segundo
+        actualizarReloj();
+        setInterval(actualizarReloj, 1000);
+
+        // Función para actualizar las barras según el audio
+        function updateBarsFromAudio() {
+            if (isAudioActive && analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                const bars = document.querySelectorAll('.bar');
+                
+                // Dividir el espectro en 7 partes para las 7 barras (izquierda y derecha)
+                const binCount = Math.floor(dataArray.length / 7);
+                
+                bars.forEach((bar, index) => {
+                    // Calcular el promedio de frecuencias para cada barra
+                    let sum = 0;
+                    for (let i = 0; i < binCount; i++) {
+                        sum += dataArray[(index % 7) * binCount + i];
+                    }
+                    const average = sum / binCount;
+                    
+                    // Escalar la altura basada en el audio (más sensible)
+                    const heightMultiplier = (average / 255) * 4;
+                    const newHeight = 15 + (heightMultiplier * 120);
+                    
+                    // Aplicar cambios sin animación CSS para mejor reactividad
+                    bar.style.height = newHeight + 'px';
+                    bar.style.opacity = 0.4 + (average / 255) * 0.6;
+                    bar.style.boxShadow = `0 0 ${10 + (average / 255) * 30}px rgba(200, 100, 50, ${0.5 + (average / 255) * 0.5})`;
+                });
+            }
+            
+            requestAnimationFrame(updateBarsFromAudio);
+        }
+
+        // Generar partículas de fuego
+        // (Función removida para permitir fondo personalizado)
+
+        // Crear destellos en movimiento del mouse
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.95) {
+                const spark = document.createElement('div');
+                spark.className = 'spark';
+                spark.style.left = e.clientX + 'px';
+                spark.style.top = e.clientY + 'px';
+                spark.style.setProperty('--sx', (Math.random() - 0.5) * 80 + 'px');
+                spark.style.setProperty('--sy', (Math.random() - 0.5) * 80 + 'px');
+                document.body.appendChild(spark);
+                
+                setTimeout(() => spark.remove(), 2000);
+            }
+        });
+    </script>
+</body>
+</html>
